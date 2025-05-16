@@ -2,10 +2,17 @@ const $slotMachine = document.getElementById('slot-machine');
 const $slot1 = document.getElementById('slot1');
 const $slot2 = document.getElementById('slot2');
 const $slot3 = document.getElementById('slot3');
-const symbols = ['🍒', '7', '🍋', '🍉'];
-let startOffset = [0, 12, 20, 36];
+const symbols = ['🍒', '💎', '🍉', '🔔'];
+const usedSymbols = [
+    Array.from({ length: 4 }, () => symbols[Math.floor(Math.random() * symbols.length)]),
+    Array.from({ length: 4 }, () => symbols[Math.floor(Math.random() * symbols.length)]),
+    Array.from({ length: 4 }, () => symbols[Math.floor(Math.random() * symbols.length)])
+];
+let startOffset = [0, 12, 24, 36];
 let offset = [Array.from(startOffset), Array.from(startOffset), Array.from(startOffset)];
 let velocity = [3, 3, 3, 3]; // Ensure velocity has the same length as startOffset
+let delay = [2, 9, 1, 8];
+let doSlowdown = [false, false, false];
 // Init
 for (const slot of $slotMachine.children) {
     for (const symbol of symbols) {
@@ -14,6 +21,11 @@ for (const slot of $slotMachine.children) {
         symbolDiv.classList.add('symbol-div');
         slot.appendChild(symbolDiv);
     }
+}
+for (let i = 0; i < delay.length; i++) {
+    setTimeout(() => {
+        doSlowdown[i] = true;
+    }, delay[i] * 1000);
 }
 // Loop
 requestAnimationFrame(gamba);
@@ -27,8 +39,17 @@ function gamba() {
         }
     }
     // Slowdown
-    if (velocity[1] > 0) {
-        velocity[1] -= 0.01;
+    const slowdownDelta = 0.01;
+    for (let i = 0; i < velocity.length; i++) {
+        if (doSlowdown[i]) {
+            if (velocity[i] > 0) {
+                velocity[i] -= slowdownDelta;
+                // Full stop
+                if (velocity[i] < 0.1 && velocity[i] > -0.1) {
+                    velocity[i] = 0;
+                }
+            }
+        }
     }
     // Update CSS
     for (let i = 0; i < $slotMachine.children.length; i++) {
@@ -38,6 +59,6 @@ function gamba() {
             symbolDiv.style.transform = `translateY(${offset[i][j] - 50}px)`;
         }
     }
-    console.log(offset[0], offset[1], offset[2]); // Debug
+    console.log(doSlowdown, offset[0], offset[1], offset[2]); // Debug
     requestAnimationFrame(gamba);
 }
