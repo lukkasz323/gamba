@@ -1,0 +1,14 @@
+#slot-machine {
+    position: absolute;
+}
+
+#slot-machine {
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid #000;
+    overflow: hidden;
+}
+
+.symbol-div {
+    height: 10px;
+}
